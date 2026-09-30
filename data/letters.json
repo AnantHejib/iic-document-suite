@@ -1,0 +1,60 @@
+[
+  {
+    "letterId": "LSIT/IIC/2627/002",
+    "date": "2026-10-02",
+    "dateFormatted": "02/10/2026",
+    "recipient": {
+      "name": "Prof. Rajesh Sharma",
+      "designation": "CTO",
+      "institution": "Pune"
+    },
+    "salutation": "Respected Sir,",
+    "subject": "Device B Live Sync Test Letter",
+    "content": "<p>This letter was drafted on Mobile / Device B.</p>",
+    "signoff": "Yours sincerely,",
+    "entity": "Team IIC",
+    "organization": "Sinhgad Institute of Technology, Lonavala",
+    "signatories": [
+      {
+        "name": "Dr. M. S. Chaudhari",
+        "designation": "R&D Dean"
+      }
+    ],
+    "id": "doc_1790803543368",
+    "createdAt": "2026-09-30T21:25:43.000Z",
+    "updatedAt": "2026-09-30T21:25:43.000Z"
+  },
+  {
+    "id": "doc_sample_001",
+    "letterId": "LSIT/IIC/2627/001",
+    "date": "2026-10-01",
+    "dateFormatted": "01/10/2026",
+    "recipient": {
+      "name": "Dr. P. S. Patil",
+      "designation": "Head of Department, First-Year Engineering",
+      "institution": "Sinhgad Institute of Technology, Lonavala"
+    },
+    "salutation": "Respected Sir,",
+    "subject": "Permission to Conduct Classroom Publicity for “Drone Workshop 2026”",
+    "content": "<p>We hope you are doing well.</p><p>Team IIC is organizing <strong>“Drone Workshop 2026”</strong> exclusively for First-Year Engineering students on <strong>3 October 2026</strong>. The workshop aims to develop enthusiasm and passion for practical engineering among students by providing them with an opportunity to explore <strong>drone technology, computer engineering, and various other engineering domains</strong> through hands-on learning.</p><p>This workshop also marks the beginning of a <strong>new era for the fourth generation of Team IIC</strong>. Through this initiative, we aim to foster innovation, creativity, technical curiosity, and active participation among First-Year Engineering students.</p><p>To create awareness about the workshop and encourage student participation, we would like to conduct a brief <strong>classroom publicity campaign</strong> in the First-Year Engineering classrooms. We assure you that the classroom visits will be conducted for a short duration and will be planned in a manner that causes minimal disruption to regular academic activities.</p><p>We kindly request your <strong>permission and support to visit the FE classrooms</strong> and promote the workshop at a suitable time as per the department's convenience.</p><p>We would be grateful for your consideration and support.</p><p><strong>Thank you.</strong></p>",
+    "signoff": "Yours sincerely,",
+    "entity": "Team IIC",
+    "organization": "Sinhgad Institute of Technology, Lonavala",
+    "signatories": [
+      {
+        "name": "Dr. M. S. Chaudhari",
+        "designation": "R&D DEAN & IIC PRESIDENT",
+        "hasEsign": false,
+        "esignData": null
+      },
+      {
+        "name": "Dr. P. S. Patil",
+        "designation": "Head of Department FE",
+        "hasEsign": false,
+        "esignData": null
+      }
+    ],
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "updatedAt": "2026-10-01T00:00:00.000Z"
+  }
+]

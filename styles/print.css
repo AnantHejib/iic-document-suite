@@ -1,0 +1,86 @@
+/* ==========================================================================
+   IIC DocCraft Pro - Print Stylesheet
+   Pixel-Perfect A4 Letterhead Output for Native Browser Print to PDF
+   ========================================================================== */
+
+@page {
+  size: A4 portrait;
+  margin: 0; /* Pure edge-to-edge controlled by .a4-page margins */
+}
+
+@media print {
+  html, body {
+    width: 210mm;
+    height: auto;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    overflow: visible !important;
+  }
+
+  /* Hide all dashboard UI, controls, sidebars and overlays */
+  .top-navbar,
+  .form-panel,
+  .archive-panel,
+  .preview-controls-bar,
+  .modal-overlay,
+  .toast-container,
+  button,
+  .btn {
+    display: none !important;
+  }
+
+  .main-workspace {
+    display: block !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  .preview-panel {
+    background: transparent !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+    display: block !important;
+  }
+
+  .a4-viewport-container {
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+  }
+
+  .a4-page {
+    width: 210mm !important;
+    min-height: 297mm !important;
+    height: auto !important;
+    margin: 0 auto !important;
+    padding: 6mm 18mm 12mm 18mm !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    transform: none !important;
+    box-sizing: border-box !important;
+    page-break-after: always;
+  }
+
+  /* Keep official letterhead colors and lines pristine */
+  .letterhead-header {
+    border-bottom: 2px solid #000000 !important;
+    page-break-inside: avoid !important;
+  }
+
+  .society-title {
+    color: #1700AC !important;
+  }
+
+  .doc-signatories-table {
+    page-break-inside: avoid !important;
+  }
+
+  .doc-footer-bar {
+    page-break-inside: avoid !important;
+  }
+}

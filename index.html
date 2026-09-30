@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IIC Document Generator & Letterhead Automation Suite | SIT Lonavala</title>
+  <meta name="description" content="Automated official document and letter generation system for Institution's Innovation Council (IIC) at Sinhgad Institute of Technology, Lonavala with standard letterhead, e-signatures, letter ID registry, and Word/PDF export.">
+  
+  <!-- Modern Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/print.css" media="print">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="top-navbar" id="main-header">
+    <div class="brand-section">
+      <div class="brand-logo-icon">IIC</div>
+      <div class="brand-text">
+        <h1>
+          DocCraft Pro
+          <span class="brand-badge">SIT Lonavala</span>
+        </h1>
+        <p>Institution's Innovation Council &bull; Document Automation Suite</p>
+      </div>
+    </div>
+
+    <div class="navbar-center-info">
+      <div class="current-id-badge" title="Active Letter Reference ID">
+        <span>Current Letter:</span>
+        <strong id="nav-current-letter-id">LSIT/IIC/2627/001</strong>
+      </div>
+
+      <div class="sync-badge sync-offline" id="sync-status-badge" onclick="window.SyncManager.openMultiDeviceModal()" title="Multi-Device Sync Status (Click to connect & share with other devices)">
+        <span class="sync-dot dot-offline"></span>
+        <span>Checking Sync...</span>
+      </div>
+    </div>
+
+    <div class="navbar-actions">
+      <button class="btn btn-outline" id="btn-new-letter" title="Draft New Letter (Clean Slate)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        New Letter
+      </button>
+
+      <button class="btn btn-success" id="btn-save-letter" title="Save / Update Document">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+        Save Letter
+      </button>
+
+      <button class="btn btn-primary" id="btn-save-as-new" title="Always Save as a Brand New Letter (Assigns Next ID without replacing)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        Save as New
+      </button>
+
+      <button class="btn btn-secondary" id="btn-print-pdf" title="Instant Print or Save as PDF">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+        Print / PDF
+      </button>
+
+      <button class="btn btn-secondary" id="btn-download-docx" title="Download as Native Microsoft Word Document">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        Word (.docx)
+      </button>
+
+      <button class="btn btn-secondary" id="btn-toggle-archive" title="Toggle Letter IDs & Archive Panel">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+        Letter Archive
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Three-Panel Workspace -->
+  <main class="main-workspace">
+
+    <!-- Panel A: Form Controls & Builders (Left) -->
+    <aside class="form-panel" id="form-panel">
+      <div class="form-content">
+
+        <!-- Card 1: Letter Reference ID & Template -->
+        <div class="form-card">
+          <div class="card-title">
+            <span>1. Letter Reference ID & Template</span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group" style="flex: 2;">
+              <label for="input-letter-id">Letter ID (Official Reference):</label>
+              <input type="text" id="input-letter-id" class="input-control" value="LSIT/IIC/2627/001" placeholder="e.g. LSIT/IIC/2627/001">
+            </div>
+            <div class="form-group" style="flex: 1; align-self: flex-end;">
+              <button class="btn btn-secondary btn-sm" id="btn-next-letter-id" title="Generate Next Incremented ID" style="width: 100%; height: 35px;">
+                + Next ID
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="input-letter-date">Document Date:</label>
+            <input type="date" id="input-letter-date" class="input-control" value="2026-10-01">
+          </div>
+
+          <div class="form-group">
+            <label for="template-select">Ready-to-Use IIC Template:</label>
+            <select id="template-select" class="input-control">
+              <!-- Populated via JS -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Card 2: Recipient Details ("To who i want to write a Letter" - ANY NAME) -->
+        <div class="form-card">
+          <div class="card-title">
+            <span>2. Recipient Information (To Whom You Are Writing)</span>
+          </div>
+
+          <div class="form-group">
+            <label for="input-recipient-name">Recipient Name / Dignitary (Type Any Name):</label>
+            <input type="text" id="input-recipient-name" class="input-control" placeholder="Type anyone's name (e.g. Dr. P. S. Patil, Prof. Sharma, Mr. Rajesh Gupta)" value="Dr. P. S. Patil">
+          </div>
+
+          <div class="form-group">
+            <label for="input-recipient-desig">Designation / Department:</label>
+            <input type="text" id="input-recipient-desig" class="input-control" placeholder="Type designation (e.g. Head of Department, First-Year Engineering / Principal / Director)" value="Head of Department, First-Year Engineering">
+          </div>
+
+          <div class="form-group">
+            <label for="input-recipient-institution">College / Institution / Organization Name:</label>
+            <input type="text" id="input-recipient-institution" class="input-control" value="Sinhgad Institute of Technology, Lonavala" placeholder="Type college, university, or company name">
+          </div>
+        </div>
+
+        <!-- Card 3: Salutation & Subject -->
+        <div class="form-card">
+          <div class="card-title">
+            <span>3. Salutation & Subject</span>
+          </div>
+
+          <div class="form-group">
+            <label for="salutation-select">Salutation (Respected Sir / Madam):</label>
+            <select id="salutation-select" class="input-control">
+              <!-- Populated via JS -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="input-letter-subject">Subject Line:</label>
+            <input type="text" id="input-letter-subject" class="input-control" value="Permission to Conduct Classroom Publicity for “Drone Workshop 2026”" placeholder="Subject of the letter">
+          </div>
+        </div>
+
+        <!-- Card 4: Letter Body Content -->
+        <div class="form-card">
+          <div class="card-title">
+            <span>4. Letter Content</span>
+          </div>
+
+          <div class="editor-toolbar">
+            <button type="button" onclick="window.execEditorCmd('bold')" title="Bold"><b>B</b></button>
+            <button type="button" onclick="window.execEditorCmd('italic')" title="Italic"><i>I</i></button>
+            <button type="button" onclick="window.execEditorCmd('underline')" title="Underline"><u>U</u></button>
+            <button type="button" onclick="window.execEditorCmd('insertUnorderedList')" title="Bullet List">&bull; List</button>
+            <button type="button" onclick="window.execEditorCmd('removeFormat')" title="Clear Format">&times;</button>
+          </div>
+
+          <div id="rich-content-editor" class="rich-editor-box" contenteditable="true">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- Card 5: Sign-off & Ending -->
+        <div class="form-card">
+          <div class="card-title">
+            <span>5. Sign-off & Closing</span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="signoff-select">Sign-off:</label>
+              <select id="signoff-select" class="input-control">
+                <!-- Populated via JS -->
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="entity-select">Team / Entity:</label>
+              <select id="entity-select" class="input-control">
+                <!-- Populated via JS -->
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="input-organization">Organization Tagline:</label>
+            <input type="text" id="input-organization" class="input-control" value="Sinhgad Institute of Technology, Lonavala">
+          </div>
+        </div>
+
+        <!-- Card 6: Signatories & E-Signatures -->
+        <div class="form-card">
+          <div class="card-title">
+            <span>6. Signatures & E-Signs</span>
+            <select id="signatory-count-select" class="input-control" style="width: auto; padding: 2px 6px; font-size: 11px;">
+              <option value="2">2 Signatories</option>
+              <option value="1">1 Signatory</option>
+              <option value="3">3 Signatories</option>
+            </select>
+          </div>
+
+          <div id="signatories-form-container" class="signatories-container">
+            <!-- Populated dynamically via JS -->
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- Panel B: Live Document Preview (Center) -->
+    <section class="preview-panel" id="preview-panel">
+
+      <!-- Zoom & Status Bar -->
+      <div class="preview-controls-bar">
+        <div class="preview-status-indicator">
+          <span class="status-dot"></span>
+          <span>Live Letterhead Preview (Pixel-Perfect A4 Format)</span>
+        </div>
+
+        <div class="preview-zoom-actions">
+          <button class="btn btn-secondary btn-sm" id="btn-zoom-out" title="Zoom Out">-</button>
+          <span id="zoom-percentage-text">100%</span>
+          <button class="btn btn-secondary btn-sm" id="btn-zoom-in" title="Zoom In">+</button>
+          <button class="btn btn-secondary btn-sm" id="btn-zoom-reset" title="Reset Zoom">Fit</button>
+        </div>
+      </div>
+
+      <!-- Real A4 Viewport Container -->
+      <div class="a4-viewport-container">
+        <div class="a4-page" id="a4-document-sheet">
+
+          <!-- Official Locked Letterhead (Standardized & Untouched) -->
+          <header class="letterhead-header">
+            <!-- Left Logo: STES Sinhgad Logo -->
+            <div class="letterhead-logo-left">
+              <img id="letterhead-left-logo-img" alt="Sinhgad Technical Education Society Logo" src="assets/sinhgad_logo.png">
+            </div>
+
+            <!-- Center Official College & Council Title -->
+            <div class="letterhead-center-text">
+              <div class="society-title">Sinhgad Technical Education Society's</div>
+              <div class="institute-title">SINHGAD INSTITUTE OF TECHNOLOGY, LONAVALA</div>
+              <div class="affiliation-subtitle">(Affiliated to Savitribai Phule Pune University and Approved by AICTE, New Delhi)</div>
+              <div class="naac-grade">Accredited by NAAC with Grade "A"</div>
+              <div class="iic-council-title">INSTITUTION'S INNOVATION COUNCIL</div>
+            </div>
+
+            <!-- Right Logo: IIC Logo -->
+            <div class="letterhead-logo-right">
+              <img id="letterhead-right-logo-img" alt="Institution's Innovation Council Logo" src="assets/iic_logo.png">
+            </div>
+          </header>
+
+          <!-- Document Body -->
+          <article class="letter-document-body">
+            <!-- Date -->
+            <div class="doc-date-line" id="preview-date-line">Date :     01/10/2026</div>
+
+            <!-- Recipient Block -->
+            <div class="doc-recipient-block" id="preview-recipient-block">
+              <div class="to-label">To,</div>
+              <div>Dr. P. S. Patil</div>
+              <div>Head of Department, First-Year Engineering</div>
+              <div>Sinhgad Institute of Technology, Lonavala</div>
+            </div>
+
+            <!-- Subject -->
+            <div class="doc-subject-line" id="preview-subject-line">Subject: Permission to Conduct Classroom Publicity for “Drone Workshop 2026”</div>
+
+            <!-- Salutation -->
+            <div class="doc-salutation-line" id="preview-salutation-line">Respected Sir,</div>
+
+            <!-- Body Paragraphs -->
+            <div class="doc-content-paragraphs" id="preview-content-paragraphs">
+              <!-- Dynamically populated -->
+            </div>
+
+            <!-- Sign-off Block -->
+            <div class="doc-signoff-block" id="preview-signoff-block">
+              <div>Yours sincerely,</div>
+              <div class="entity-name">Team IIC</div>
+              <div>Sinhgad Institute of Technology, Lonavala</div>
+            </div>
+
+            <!-- Signatures Table -->
+            <div class="doc-signatories-table" id="preview-signatories-table">
+              <!-- Dynamically populated with E-Signs -->
+            </div>
+
+            <!-- Footer: Letter ID -->
+            <footer class="doc-footer-bar">
+              <span class="doc-letter-id-text" id="preview-letter-id-text">Letter ID: LSIT/IIC/2627/001</span>
+            </footer>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Panel C: Letter ID Archive & Registry (Right) -->
+    <aside class="archive-panel" id="archive-panel">
+      <div class="archive-header">
+        <div class="archive-title-row">
+          <h3>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+            Letter ID Registry
+          </h3>
+          <span class="brand-badge" id="archive-count-badge">1</span>
+        </div>
+
+        <div class="archive-search-box">
+          <svg class="search-icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="archive-search-input" class="input-control" placeholder="Search ID, recipient, subject...">
+        </div>
+      </div>
+
+      <div class="archive-list-container" id="archive-letter-list">
+        <!-- Rendered by ArchiveManager -->
+      </div>
+
+      <div class="archive-footer-actions">
+        <button class="btn btn-secondary btn-sm" id="btn-export-backup" style="flex: 1;" title="Export all letters as JSON Backup">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Backup JSON
+        </button>
+
+        <label class="btn btn-secondary btn-sm" style="flex: 1; text-align: center; cursor: pointer;" title="Restore letters from JSON Backup">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+          Import
+          <input type="file" id="file-import-backup" accept=".json" style="display: none;">
+        </label>
+      </div>
+    </aside>
+
+  </main>
+
+  <!-- E-Sign Interactive Signature Pad Modal -->
+  <div class="modal-overlay" id="esign-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Electronic Signature (E-Sign) for <span id="esign-modal-target-name">Signatory</span></h3>
+        <button class="btn-card-action" onclick="window.EsignManager.closeModal()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <p style="font-size: 12px; color: var(--text-muted);">
+          Draw your official signature below using mouse/touchpad, or upload a transparent PNG image.
+        </p>
+
+        <div class="canvas-container">
+          <canvas id="esign-canvas"></canvas>
+        </div>
+
+        <div class="canvas-toolbar">
+          <div class="color-picker-group">
+            <span style="font-size: 11px; color: var(--text-dim); margin-right: 4px;">Ink:</span>
+            <div class="color-dot active" style="background: #002060;" onclick="window.EsignManager.setPenColor('#002060')" title="Official Navy Blue"></div>
+            <div class="color-dot" style="background: #000000;" onclick="window.EsignManager.setPenColor('#000000')" title="Deep Black"></div>
+            <div class="color-dot" style="background: #1e3a8a;" onclick="window.EsignManager.setPenColor('#1e3a8a')" title="Royal Blue"></div>
+          </div>
+
+          <div style="display: flex; gap: 6px;">
+            <button class="btn btn-secondary btn-sm" onclick="window.EsignManager.clearCanvas()">Clear</button>
+            <button class="btn btn-secondary btn-sm" onclick="window.EsignManager.generateScriptSignature()" title="Generate stylized cursive signature">Digital Script</button>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 6px;">
+          <label style="font-size: 11px;">Or Upload Signature Image (PNG / JPG):</label>
+          <input type="file" id="esign-file-upload" class="input-control" accept="image/*">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="window.EsignManager.closeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="window.EsignManager.saveSignature()">Apply to Document</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post-Save Download & Next Action Modal -->
+  <div class="modal-overlay" id="save-download-modal">
+    <div class="modal-card" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3 style="color: #34d399; display: flex; align-items: center; gap: 8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          Letter Saved Successfully!
+        </h3>
+        <button class="btn-card-action" onclick="window.closeSaveDownloadModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="background: rgba(255, 255, 255, 0.05); padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border-color);">
+          <div style="font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em;">Saved Reference ID:</div>
+          <div id="modal-saved-letter-id" style="font-size: 18px; font-weight: 700; color: #60a5fa; font-family: monospace; margin-top: 2px;">LSIT/IIC/2627/001</div>
+          <div id="modal-saved-recipient-text" style="font-size: 13px; color: var(--text-main); margin-top: 4px;">To: Dr. P. S. Patil</div>
+        </div>
+
+        <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
+          The document is stored in your <strong>Letter Archive</strong>. You can now download it directly:
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 6px;">
+          <button class="btn btn-primary" id="modal-btn-download-pdf" style="justify-content: center; padding: 12px; font-size: 14px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            Download / Print as PDF
+          </button>
+
+          <button class="btn btn-secondary" id="modal-btn-download-docx" style="justify-content: center; padding: 12px; font-size: 14px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            Download Word Document (.docx)
+          </button>
+
+          <button class="btn btn-outline" id="modal-btn-next-letter" style="justify-content: center; padding: 10px; font-size: 13px; border-color: #3b82f6; color: #60a5fa;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Start Another Letter (Auto-Increments ID)
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" onclick="window.closeSaveDownloadModal()">Continue Editing</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Letter ID Conflict / Overwrite Guard Modal -->
+  <div class="modal-overlay" id="save-conflict-modal">
+    <div class="modal-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 style="color: #f59e0b; display: flex; align-items: center; gap: 8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          Letter ID Already Exists in Archive!
+        </h3>
+        <button class="btn-card-action" onclick="window.closeSaveConflictModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--text-main);">
+          A document with Reference ID <strong id="conflict-modal-letter-id" style="color: #60a5fa; font-family: monospace;"></strong> already exists in your records.
+        </p>
+        <p style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">
+          If this is a <strong>different letter</strong>, choose <strong>Save as New Letter</strong> so it gets the next sequential ID and does NOT replace the other letter!
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 14px;">
+          <button class="btn btn-primary" id="conflict-btn-save-as-new" style="justify-content: center; padding: 11px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Save as New Letter (Auto-Assign Next ID)
+          </button>
+          <button class="btn btn-secondary" id="conflict-btn-update-existing" style="justify-content: center; padding: 11px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+            Update Existing Letter Record
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" onclick="window.closeSaveConflictModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Multi-Device Connection & Live Sync Modal -->
+  <div class="modal-overlay" id="multi-device-modal">
+    <div class="modal-card" style="max-width: 560px;">
+      <div class="modal-header">
+        <h3 style="color: #60a5fa; display: flex; align-items: center; gap: 8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          Multi-Device Live Sync (Over Any Network Worldwide)
+        </h3>
+        <button class="btn-card-action" onclick="window.SyncManager.closeMultiDeviceModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--text-muted);">
+          Anyone anywhere on earth on <strong>ANY network</strong> (4G/5G mobile, home Wi-Fi, other colleges) can open this software and stay synced live in real time.
+        </p>
+
+        <!-- Global Worldwide Internet Access Box -->
+        <div id="network-global-box" style="background: rgba(37, 99, 235, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); border-radius: 8px; padding: 14px; display: none; flex-direction: column; gap: 8px;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 11px; font-weight: 700; color: #60a5fa; text-transform: uppercase;">🌐 Global Worldwide Public Link (Any Network / 4G / 5G / Home):</span>
+            <span class="badge-has-sign" style="font-size: 10px;">Worldwide Active</span>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <code id="network-global-url-text" style="flex: 1; background: #0f172a; border: 1px solid #2563eb; padding: 8px 12px; border-radius: 6px; font-size: 13px; color: #93c5fd; font-weight: 700; overflow-x: auto;">Initializing global link...</code>
+            <button class="btn btn-primary btn-sm" onclick="window.SyncManager.copyGlobalLink()" title="Copy Global Link">
+              Copy Global Link
+            </button>
+          </div>
+          <small style="color: var(--text-muted); font-size: 11px;">
+            Share this link on WhatsApp or Email with anyone in the world!
+          </small>
+        </div>
+
+        <!-- Local Network Wi-Fi Link Box -->
+        <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 6px;">
+          <span style="font-size: 11px; font-weight: 700; color: #93c5fd; text-transform: uppercase;">💻 Local Wi-Fi / LAN Link:</span>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <code id="network-share-url-text" style="flex: 1; background: #0f172a; border: 1px solid #334155; padding: 7px 10px; border-radius: 6px; font-size: 12px; color: #34d399; font-weight: 600; overflow-x: auto;">http://172.17.242.36:3000/index.html</code>
+            <button class="btn btn-secondary btn-sm" onclick="window.SyncManager.copyNetworkLink()" title="Copy Link to Clipboard">
+              Copy Link
+            </button>
+          </div>
+        </div>
+
+        <!-- Phone / Tablet QR Code -->
+        <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; display: flex; align-items: center; gap: 16px;">
+          <div id="network-share-qrcode" style="background: #ffffff; padding: 6px; border-radius: 8px; display: flex; align-items: center; justify-content: center; min-width: 140px; min-height: 140px;">
+            <!-- Rendered by QRCode.js -->
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <span style="font-size: 12px; font-weight: 700; color: #f8fafc;" id="network-qr-target-label">Scan to Open on Phone / Mobile Data</span>
+            <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">
+              Scan this code with any phone camera to draft or view letters from your mobile device.
+            </p>
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #34d399;">
+              <span class="status-dot"></span>
+              <span>Live Bi-Directional Cloud Sync</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 24/7 Cloud Database (Firebase / Serverless) -->
+        <div style="background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 6px;">
+          <span style="font-size: 11px; font-weight: 700; color: #cbd5e1; text-transform: uppercase;">☁️ 24/7 Serverless Cloud Sync (Firebase):</span>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="input-firebase-url" class="input-control" placeholder="https://your-project-default-rtdb.firebaseio.com" style="flex: 1; font-size: 12px;">
+            <button class="btn btn-secondary btn-sm" onclick="window.SyncManager.saveFirebaseSettings()">
+              Save Cloud URL
+            </button>
+          </div>
+          <small style="color: var(--text-dim); font-size: 11px;">
+            Optional: Add a free Google Firebase Realtime Database URL to sync 24/7 even if your PC is turned off.
+          </small>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 4px;">
+          <button class="btn btn-outline btn-sm" onclick="window.SyncManager.pullLettersFromServer(true)">
+            🔄 Force Refresh / Sync Now
+          </button>
+          <span style="font-size: 11px; color: var(--text-dim);">Central DB: data/letters.json</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" onclick="window.SyncManager.closeMultiDeviceModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="assets/jszip.min.js"></script>
+  <script src="assets/qrcode.min.js"></script>
+  <script src="assets/logos_base64.js"></script>
+  <script src="assets/docx_template_base64.js"></script>
+  <script src="scripts/templates.js"></script>
+  <script src="scripts/archive.js"></script>
+  <script src="scripts/sync.js"></script>
+  <script src="scripts/esign.js"></script>
+  <script src="scripts/docx_export.js"></script>
+  <script src="scripts/app.js"></script>
+</body>
+</html>
+
