@@ -18,9 +18,29 @@ window.SyncManager = {
     this.initFirebaseSyncIfConfigured();
   },
 
+  getServerBaseUrl() {
+    const custom = localStorage.getItem('iic_custom_server_url');
+    if (custom) return custom.trim().replace(/\/+$/, '');
+    return '';
+  },
+
+  setServerBaseUrl(url) {
+    if (url && url.trim()) {
+      let cleanUrl = url.trim().replace(/\/+$/, '');
+      if (!cleanUrl.startsWith('http')) cleanUrl = 'https://' + cleanUrl;
+      localStorage.setItem('iic_custom_server_url', cleanUrl);
+      window.showToast('Connecting to Backend Server: ' + cleanUrl, 'info');
+    } else {
+      localStorage.removeItem('iic_custom_server_url');
+      window.showToast('Removed custom server URL. Using default.', 'info');
+    }
+    this.checkServerConnection();
+  },
+
   async checkServerConnection() {
+    const baseUrl = this.getServerBaseUrl();
     try {
-      const response = await fetch('/api/network-info', { method: 'GET', cache: 'no-store' });
+      const response = await fetch(`${baseUrl}/api/network-info`, { method: 'GET', cache: 'no-store' });
       if (response.ok) {
         this.networkInfo = await response.json();
         this.isServerOnline = true;
@@ -32,7 +52,7 @@ window.SyncManager = {
         this.updateStatusBadge(false);
       }
     } catch (e) {
-      // Opened via file:// or server not running
+      // Opened via file:// or static hosting without backend connected
       this.isServerOnline = false;
       this.updateStatusBadge(false);
     }
@@ -42,14 +62,15 @@ window.SyncManager = {
     if (!this.syncStatusEl) return;
     if (online) {
       const isGlobal = this.networkInfo?.isGlobal && this.networkInfo?.globalUrl;
+      const isCustom = Boolean(this.getServerBaseUrl());
       this.syncStatusEl.className = 'sync-badge sync-online';
       this.syncStatusEl.innerHTML = `
         <span class="sync-dot dot-online"></span>
-        <span>${isGlobal ? '🌐 Global Sync: Live (Any Network)' : '🟢 Multi-Device: Synced (Wi-Fi)'}</span>
+        <span>${isGlobal ? '🌐 Global Sync: Live (Any Network)' : (isCustom ? '🌐 Cloud Server: Connected' : '🟢 Multi-Device: Synced (Wi-Fi)')}</span>
       `;
       this.syncStatusEl.title = isGlobal 
         ? `Live on Global Internet at ${this.networkInfo.globalUrl}. Accessible worldwide from any phone, laptop or network!`
-        : `Connected to central database at ${this.networkInfo?.networkUrl || 'local server'}. Click to share with other devices.`;
+        : `Connected to central database at ${this.getServerBaseUrl() || this.networkInfo?.networkUrl || 'local server'}. Click to share with other devices.`;
     } else {
       const fbUrl = this.getFirebaseUrl();
       if (fbUrl) {
@@ -60,12 +81,15 @@ window.SyncManager = {
         `;
         this.syncStatusEl.title = `Connected to Firebase Cloud at ${fbUrl}`;
       } else {
+        const isGithubPages = window.location.hostname.includes('github.io');
         this.syncStatusEl.className = 'sync-badge sync-offline';
         this.syncStatusEl.innerHTML = `
           <span class="sync-dot dot-offline"></span>
-          <span>Standalone / Offline Mode</span>
+          <span>${isGithubPages ? '⚠️ Offline Mode (Click to Connect)' : 'Standalone / Offline Mode'}</span>
         `;
-        this.syncStatusEl.title = 'Running locally. Start server.py or Launch_Global_Internet_Access.bat to sync over any network.';
+        this.syncStatusEl.title = isGithubPages 
+          ? 'GitHub Pages is static. Click here to connect to your live Python server, localtunnel, or Render cloud backend!'
+          : 'Server offline. Run Launch_IIC_Doc_App.bat or click to configure sync.';
       }
     }
   },
@@ -74,6 +98,7 @@ window.SyncManager = {
     if (this.pollInterval) clearInterval(this.pollInterval);
     // Poll server version every 2.5 seconds
     this.pollInterval = setInterval(async () => {
+      const baseUrl = this.getServerBaseUrl();
       if (!this.isServerOnline) {
         // Try reconnecting periodically or check Firebase
         await this.checkServerConnection();
@@ -84,7 +109,7 @@ window.SyncManager = {
       }
 
       try {
-        const res = await fetch('/api/version', { cache: 'no-store' });
+        const res = await fetch(`${baseUrl}/api/version`, { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
           if (data.version && data.version > this.localDbVersion) {
@@ -103,7 +128,8 @@ window.SyncManager = {
 
   async pullLettersFromServer(isLiveUpdate = false) {
     try {
-      const res = await fetch('/api/letters', { cache: 'no-store' });
+      const baseUrl = this.getServerBaseUrl();
+      const res = await fetch(`${baseUrl}/api/letters`, { cache: 'no-store' });
       if (!res.ok) return;
 
       const data = await res.json();
@@ -136,10 +162,11 @@ window.SyncManager = {
   },
 
   async pushLetterToServer(letter, forceAsNew = false) {
-    // 1. Push to Python Server if online
+    // 1. Push to Python Server if online (local or cloud)
     if (this.isServerOnline) {
       try {
-        const res = await fetch('/api/letters', {
+        const baseUrl = this.getServerBaseUrl();
+        const res = await fetch(`${baseUrl}/api/letters`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ letter, forceAsNew })
@@ -163,7 +190,8 @@ window.SyncManager = {
   async deleteLetterFromServer(letterId) {
     if (this.isServerOnline) {
       try {
-        const res = await fetch(`/api/letters/${encodeURIComponent(letterId)}`, {
+        const baseUrl = this.getServerBaseUrl();
+        const res = await fetch(`${baseUrl}/api/letters/${encodeURIComponent(letterId)}`, {
           method: 'DELETE'
         });
         if (res.ok) {
@@ -311,6 +339,12 @@ window.SyncManager = {
       fbInput.value = this.getFirebaseUrl();
     }
 
+    // 5. Populate Custom Server URL input
+    const serverInput = document.getElementById('input-custom-server-url');
+    if (serverInput) {
+      serverInput.value = this.getServerBaseUrl();
+    }
+
     modal.classList.add('active');
   },
 
@@ -339,6 +373,19 @@ window.SyncManager = {
         prompt('Copy this Wi-Fi link for devices on the same network:', text);
       });
     }
+  },
+
+  saveCustomServerSettings() {
+    const input = document.getElementById('input-custom-server-url');
+    if (input) {
+      this.setServerBaseUrl(input.value);
+    }
+  },
+
+  clearCustomServerSettings() {
+    this.setServerBaseUrl('');
+    const input = document.getElementById('input-custom-server-url');
+    if (input) input.value = '';
   },
 
   saveFirebaseSettings() {

@@ -529,6 +529,23 @@
           </div>
         </div>
 
+        <!-- Connect to Backend Server / Cloud API (Render / Tunnel / Python) -->
+        <div style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 6px;">
+          <span style="font-size: 11px; font-weight: 700; color: #38bdf8; text-transform: uppercase;">🔗 Connect Static Web to Live Backend (Render / Tunnel):</span>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="input-custom-server-url" class="input-control" placeholder="e.g. https://your-app.onrender.com or https://xxxx.loca.lt" style="flex: 1; font-size: 12px;">
+            <button class="btn btn-primary btn-sm" onclick="window.SyncManager.saveCustomServerSettings()">
+              Connect
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="window.SyncManager.clearCustomServerSettings()" title="Reset">
+              Reset
+            </button>
+          </div>
+          <small style="color: var(--text-muted); font-size: 11px;">
+            Paste your Render.com or Localtunnel server URL here to connect this browser to your live central database!
+          </small>
+        </div>
+
         <!-- 24/7 Cloud Database (Firebase / Serverless) -->
         <div style="background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 6px;">
           <span style="font-size: 11px; font-weight: 700; color: #cbd5e1; text-transform: uppercase;">☁️ 24/7 Serverless Cloud Sync (Firebase):</span>

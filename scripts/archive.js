@@ -80,9 +80,46 @@ window.ArchiveManager = {
     }
   },
 
+  broadcastChannel: null,
+
+  initTabSync() {
+    if (this._tabSyncInitialized) return;
+    this._tabSyncInitialized = true;
+
+    if (window.BroadcastChannel) {
+      try {
+        this.broadcastChannel = new BroadcastChannel('iic_doccraft_sync_channel');
+        this.broadcastChannel.onmessage = (event) => {
+          if (event.data && event.data.type === 'ARCHIVE_CHANGED') {
+            this.renderArchiveList();
+            window.showToast('Letters synchronized with another active browser tab/window!', 'info');
+          }
+        };
+      } catch (e) {
+        console.warn('BroadcastChannel error', e);
+      }
+    }
+
+    window.addEventListener('storage', (e) => {
+      if (e.key === this.STORAGE_KEY) {
+        this.renderArchiveList();
+      }
+    });
+  },
+
+  notifyTabSync() {
+    if (this.broadcastChannel) {
+      try {
+        this.broadcastChannel.postMessage({ type: 'ARCHIVE_CHANGED', timestamp: Date.now() });
+      } catch (e) {}
+    }
+  },
+
   saveAllLetters(letters) {
+    this.initTabSync();
     try {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(letters));
+      this.notifyTabSync();
     } catch (e) {
       console.error('Error saving archive', e);
     }
@@ -149,8 +186,8 @@ window.ArchiveManager = {
     this.saveAllLetters(letters);
     this.renderArchiveList();
 
-    // Push to server for multi-device sync
-    if (window.SyncManager && window.SyncManager.isServerOnline) {
+    // Push to server or cloud database for multi-device sync
+    if (window.SyncManager) {
       window.SyncManager.pushLetterToServer(letterToSave, forceAsNew);
     }
 
@@ -171,7 +208,7 @@ window.ArchiveManager = {
     this.saveAllLetters(letters);
     this.renderArchiveList();
 
-    if (window.SyncManager && window.SyncManager.isServerOnline) {
+    if (window.SyncManager) {
       window.SyncManager.deleteLetterFromServer(letterId);
     }
 
@@ -196,7 +233,7 @@ window.ArchiveManager = {
     this.saveAllLetters(letters);
     this.renderArchiveList();
 
-    if (window.SyncManager && window.SyncManager.isServerOnline) {
+    if (window.SyncManager) {
       window.SyncManager.pushLetterToServer(cloned, true);
     }
 
