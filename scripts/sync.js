@@ -21,6 +21,10 @@ window.SyncManager = {
   getServerBaseUrl() {
     const custom = localStorage.getItem('iic_custom_server_url');
     if (custom) return custom.trim().replace(/\/+$/, '');
+    // Automatically connect to our live 24/7 Render cloud backend if running on GitHub Pages or local file
+    if (window.location.hostname.includes('github.io') || window.location.protocol === 'file:') {
+      return 'https://iic-document-suite.onrender.com';
+    }
     return '';
   },
 
@@ -32,7 +36,7 @@ window.SyncManager = {
       window.showToast('Connecting to Backend Server: ' + cleanUrl, 'info');
     } else {
       localStorage.removeItem('iic_custom_server_url');
-      window.showToast('Removed custom server URL. Using default.', 'info');
+      window.showToast('Reset to default cloud server connection.', 'info');
     }
     this.checkServerConnection();
   },
@@ -52,7 +56,7 @@ window.SyncManager = {
         this.updateStatusBadge(false);
       }
     } catch (e) {
-      // Opened via file:// or static hosting without backend connected
+      // Opened via static hosting without backend connected
       this.isServerOnline = false;
       this.updateStatusBadge(false);
     }
@@ -61,16 +65,17 @@ window.SyncManager = {
   updateStatusBadge(online) {
     if (!this.syncStatusEl) return;
     if (online) {
+      const isRender = window.location.hostname.includes('render.com') || this.getServerBaseUrl().includes('render.com');
       const isGlobal = this.networkInfo?.isGlobal && this.networkInfo?.globalUrl;
-      const isCustom = Boolean(this.getServerBaseUrl());
+      const labelText = isRender 
+        ? '🌐 24/7 Cloud Sync: Live (Worldwide)' 
+        : (isGlobal ? '🌐 Global Sync: Live (Any Network)' : '🟢 Multi-Device: Synced (Wi-Fi)');
       this.syncStatusEl.className = 'sync-badge sync-online';
       this.syncStatusEl.innerHTML = `
         <span class="sync-dot dot-online"></span>
-        <span>${isGlobal ? '🌐 Global Sync: Live (Any Network)' : (isCustom ? '🌐 Cloud Server: Connected' : '🟢 Multi-Device: Synced (Wi-Fi)')}</span>
+        <span>${labelText}</span>
       `;
-      this.syncStatusEl.title = isGlobal 
-        ? `Live on Global Internet at ${this.networkInfo.globalUrl}. Accessible worldwide from any phone, laptop or network!`
-        : `Connected to central database at ${this.getServerBaseUrl() || this.networkInfo?.networkUrl || 'local server'}. Click to share with other devices.`;
+      this.syncStatusEl.title = `Connected to live central cloud database at ${this.getServerBaseUrl() || this.networkInfo?.networkUrl || 'server'}. All devices are synchronized!`;
     } else {
       const fbUrl = this.getFirebaseUrl();
       if (fbUrl) {
