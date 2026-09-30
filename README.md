@@ -1,7 +1,15 @@
 # IIC DocCraft Pro - Multi-Device Document Automation Suite
 ### Sinhgad Institute of Technology, Lonavala &bull; Institution's Innovation Council (IIC)
 
-Automated official letterhead documentation system with **real-time multi-device synchronization**. Create, edit, and manage IIC letters simultaneously across multiple computers, laptops, and mobile devices!
+Automated official letterhead documentation system with **real-time multi-device synchronization**. Create, edit, and manage IIC letters simultaneously across multiple computers, laptops, and mobile devices over **ANY network worldwide**!
+
+---
+
+### 🌐 Live Public Links:
+- **Live Web App (GitHub Pages)**: [https://ananthejib.github.io/iic-document-suite/](https://ananthejib.github.io/iic-document-suite/)
+- **GitHub Repository**: [https://github.com/AnantHejib/iic-document-suite](https://github.com/AnantHejib/iic-document-suite)
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/AnantHejib/iic-document-suite)
 
 ---
 
