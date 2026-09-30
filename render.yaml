@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: iic-doccraft-pro
+    name: iic-document-suite
     env: python
     buildCommand: ""
     startCommand: "python server.py"
